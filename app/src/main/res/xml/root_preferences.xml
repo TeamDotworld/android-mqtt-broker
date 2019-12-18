@@ -1,0 +1,48 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory
+        app:icon="@drawable/ic_server"
+        app:title="@string/mqtt_header">
+
+        <SwitchPreferenceCompat
+            app:key="mqtt_broker_status"
+            app:summary="@string/broker_status_summary"
+            app:title="@string/broker_status_title" />
+
+        <EditTextPreference
+            app:key="mqtt_host"
+            app:selectable="false"
+            app:title="@string/host_title"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            app:key="mqtt_port1"
+            app:title="@string/port_title"
+            app:useSimpleSummaryProvider="true" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:icon="@drawable/ic_key"
+        app:title="@string/mqtt_auth_header">
+
+        <SwitchPreferenceCompat
+            app:key="mqtt_auth_status"
+            app:summaryOff="@string/auth_disabled_summary"
+            app:summaryOn="@string/auth_enabled_summary"
+            app:title="@string/auth_status_title" />
+
+        <EditTextPreference
+            app:dependency="mqtt_auth_status"
+            app:key="mqtt_username"
+            app:title="@string/username_title"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            app:dependency="mqtt_auth_status"
+            app:key="mqtt_password"
+            app:title="@string/password_title"
+            app:useSimpleSummaryProvider="true" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

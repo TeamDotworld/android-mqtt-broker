@@ -1,0 +1,38 @@
+<resources>
+    <string name="app_name">MQTT Broker</string>
+
+    <!--Shared Prefs keys-->
+    <string name="isFirst">is_first_time</string>
+
+
+    <!--Settings Heading-->
+    <string name="mqtt_settings_title">MQTT Broker</string>
+    <string name="mqtt_header">MQTT Settings</string>
+    <string name="mqtt_auth_header">MQTT Authentication</string>
+
+    <!--Settings Title-->
+    <string name="broker_status_title">Enable MQTT Server</string>
+    <string name="host_title">Host</string>
+    <string name="port_title">Port</string>
+    <string name="auth_status_title">Enable Authentication</string>
+    <string name="username_title">Username</string>
+    <string name="password_title">Password</string>
+
+    <!--Summary-->
+    <string name="broker_status_summary">Restart required if changes in below settings needs to be reflected</string>
+    <string name="auth_enabled_summary">You need username and password to establish connection</string>
+    <string name="auth_disabled_summary">You don\'t need username or password for connection</string>
+
+    <!--Prefs key-->
+    <string name="mqtt_broker_status">mqtt_broker_status</string>
+    <string name="mqtt_host">mqtt_host</string>
+    <string name="mqtt_port">mqtt_port1</string>
+    <string name="mqtt_auth_status">mqtt_auth_status</string>
+    <string name="mqtt_username">mqtt_username</string>
+    <string name="mqtt_password">mqtt_password</string>
+
+    <!--Service Messages-->
+    <string name="notification_title">MQTT Broker</string>
+    <string name="notification_message">This notification will keep the MQTT Broker run on background</string>
+    <string name="ticker_text">MQTT Broker Ticker</string>
+</resources>
