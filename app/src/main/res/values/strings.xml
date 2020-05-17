@@ -33,6 +33,6 @@
 
     <!--Service Messages-->
     <string name="notification_title">MQTT Broker</string>
-    <string name="notification_message">This notification will keep the MQTT Broker run on background</string>
+    <string name="notification_message">MQTT Broker service is running</string>
     <string name="ticker_text">MQTT Broker Ticker</string>
 </resources>

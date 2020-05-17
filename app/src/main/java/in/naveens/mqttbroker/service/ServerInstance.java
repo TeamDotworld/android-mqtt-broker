@@ -5,7 +5,7 @@ import android.util.Log;
 import io.moquette.broker.Server;
 
 public class ServerInstance {
-    public static final String TAG = "ServerInstance";
+    public static final String TAG = ServerInstance.class.getName();
     private static final Object INSTANCE_LOCK = new Object();
     private static Server serverInstance = null;
 
