@@ -84,7 +84,7 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
         Log.d(TAG, "Preference changed. $key")
         try {
             when (key) {
-                "mqtt_broker_status" -> {
+                getString(R.string.mqtt_broker_status) -> {
                     Log.d(TAG, "Server status changed")
                     val status = sharedPreferences.getBoolean(key, false)
                     Log.d(TAG, "Start Server?$status")
@@ -96,7 +96,7 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
                         stopService()
                     }
                 }
-                "mqtt_auth_status" -> {
+                getString(R.string.mqtt_auth_status) -> {
                     Log.d(TAG, "Restarting mqtt service")
                     Log.d(TAG, "onSharedPreferenceChanged: "+sharedPreferences.getBoolean(key, false))
                     val status = sharedPreferences.getBoolean(key, false)
@@ -108,7 +108,8 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
                     }.start()
                     Toast.makeText(this, "MQTT broker restarted with updated config", Toast.LENGTH_LONG).show()
                 }
-                "mqtt_password", "mqtt_username", "mqtt_port1" -> {
+                getString(R.string.mqtt_password), getString(R.string.mqtt_username), getString(R.string.mqtt_port)->
+                     {
                     val contextView = findViewById<View>(android.R.id.content)
                     Snackbar.make(contextView, "You need to restart the server for applying the config changes", Snackbar.LENGTH_LONG)
                             .show()
