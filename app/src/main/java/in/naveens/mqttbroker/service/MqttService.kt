@@ -54,12 +54,12 @@ open class MqttService : Service() {
             }
         } catch (e: ExecutionException) {
             Log.e(TAG, "Error kotlin : " + e.message)
-            e.printStackTrace()
+
             Toast.makeText(this, "Try using another port. Address already in use", Toast.LENGTH_SHORT).show()
             stopSelf()
             return START_NOT_STICKY
         } catch (e: Exception) {
-            e.printStackTrace()
+
             return START_NOT_STICKY
         }
         return START_STICKY
@@ -109,9 +109,11 @@ open class MqttService : Service() {
                         props.setProperty(BrokerConstants.PASSWORD_FILE_PROPERTY_NAME, file.absolutePath)
                     }
                 } catch (e: FileNotFoundException) {
-                    e.printStackTrace()
+                    Log.e(TAG, "getConfig: $e", )
+
                 } catch (e: IOException) {
-                    e.printStackTrace()
+
+                    Log.e(TAG, "getConfig: $e", )
                 }
             } else {
                 Toast.makeText(this, "Unable to generate auth file", Toast.LENGTH_SHORT).show()

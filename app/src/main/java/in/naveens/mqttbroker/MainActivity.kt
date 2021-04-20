@@ -115,7 +115,7 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
                 }
             }
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e(TAG, "onSharedPreferenceChanged: $e", )
         }
     }
     private fun initSharedPrefs() {
