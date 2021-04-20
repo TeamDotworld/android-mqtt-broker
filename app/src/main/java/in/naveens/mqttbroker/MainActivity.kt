@@ -58,7 +58,7 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
 
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
-            mPreferences = this.requireActivity().getSharedPreferences("sos_mdm", MODE_PRIVATE)
+            mPreferences = this.requireActivity().getSharedPreferences("MQTT Broker", MODE_PRIVATE)
             host=findPreference(getString(R.string.mqtt_host))
             port=findPreference(getString(R.string.mqtt_port))
             username=findPreference(getString(R.string.mqtt_username))

@@ -98,6 +98,7 @@ open class MqttService : Service() {
         if (auth) {
             val username =AppPreferences.mqttUserName
             val password = AppPreferences.mqttPassword
+            Log.d(TAG, "getConfig: psw=$password")
             if (password != null) {
                 val sha256hex = DigestUtils.sha256Hex(password)
                 val filename = "password.conf"
