@@ -3,6 +3,7 @@ package `in`.naveens.mqttbroker.service
 import android.util.Log
 import io.moquette.broker.Server
 open class ServerInstance {
+
     private val TAG = ServerInstance::class.java.name
     private var serverInstance: Server? = null
 
@@ -17,7 +18,7 @@ open class ServerInstance {
                 }
             }
         } catch (e: Exception) {
-            Log.e(TAG, e.message)
+            Log.e(TAG, "${e.message}")
         }
         return serverInstance
     }

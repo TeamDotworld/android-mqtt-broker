@@ -7,17 +7,16 @@ import java.net.BindException
 import java.util.*
 import java.util.concurrent.Callable
 
- class MQTTBroker(private var config: Properties?) : Callable<Boolean> {
+class MQTTBroker(private var config: Properties?) : Callable<Boolean> {
 
     private val TAG = MQTTBroker::class.java.name
 
-
-companion object{
-    private var server: Server? = null
-    fun getServer(): Server? {
-        return server
+    companion object {
+        private var server: Server? = null
+        fun getServer(): Server? {
+            return server
+        }
     }
-}
 
     fun stopServer() {
         server?.stopServer()
@@ -26,6 +25,8 @@ companion object{
     override fun call(): Boolean {
         try {
             server = ServerInstance().getServerInstance()
+            Log.d(TAG, "call: ${config}")
+            Log.d(TAG, "call: ${config?.get("password_file")}")
             server?.startServer(config)
             Log.d(TAG, "MQTT Broker Started")
             return true
