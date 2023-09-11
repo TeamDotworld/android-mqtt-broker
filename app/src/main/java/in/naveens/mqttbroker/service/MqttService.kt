@@ -1,20 +1,24 @@
 package `in`.naveens.mqttbroker.service
 
-import `in`.naveens.mqttbroker.MainActivity
-import `in`.naveens.mqttbroker.R
-import `in`.naveens.mqttbroker.utils.AppPreferences
-import `in`.naveens.mqttbroker.utils.Utils
-import android.app.*
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.app.Service
 import android.content.Intent
 import android.os.IBinder
 import android.util.Log
 import android.widget.Toast
+import `in`.naveens.mqttbroker.MainActivity
+import `in`.naveens.mqttbroker.R
+import `in`.naveens.mqttbroker.utils.AppPreferences
+import `in`.naveens.mqttbroker.utils.Utils
 import io.moquette.BrokerConstants
 import org.apache.commons.codec.digest.DigestUtils
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
-import java.util.*
+import java.util.Properties
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.FutureTask
 

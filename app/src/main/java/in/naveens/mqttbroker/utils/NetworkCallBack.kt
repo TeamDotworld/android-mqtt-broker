@@ -1,10 +1,9 @@
 package `in`.naveens.mqttbroker.utils
 
-import `in`.naveens.mqttbroker.MQTTBrokerApp
 import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.Network
-import android.util.Log
+import `in`.naveens.mqttbroker.MQTTBrokerApp
 
 class NetworkCallBack() : ConnectivityManager.NetworkCallback() {
 
