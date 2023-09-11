@@ -4,7 +4,7 @@ import android.util.Log
 import io.moquette.broker.Server
 import java.io.IOException
 import java.net.BindException
-import java.util.*
+import java.util.Properties
 import java.util.concurrent.Callable
 
 class MQTTBroker(private var config: Properties?) : Callable<Boolean> {

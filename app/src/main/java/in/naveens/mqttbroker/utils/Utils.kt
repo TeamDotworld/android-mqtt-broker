@@ -9,7 +9,8 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import java.net.InetAddress
 import java.net.NetworkInterface
-import java.util.*
+import java.util.Collections
+import java.util.Random
 
 object Utils {
 

@@ -1,5 +1,25 @@
 package `in`.naveens.mqttbroker
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.content.SharedPreferences
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener
+import android.content.pm.PackageManager
+import android.net.ConnectivityManager
+import android.os.Build
+import android.os.Bundle
+import android.util.Log
+import android.view.View
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.preference.EditTextPreference
+import androidx.preference.PreferenceFragmentCompat
+import androidx.preference.PreferenceManager
+import androidx.preference.SwitchPreference
+import com.google.android.material.snackbar.Snackbar
 import `in`.naveens.mqttbroker.databinding.SettingsActivityBinding
 import `in`.naveens.mqttbroker.service.MqttService
 import `in`.naveens.mqttbroker.utils.AppPreferences
@@ -9,18 +29,6 @@ import `in`.naveens.mqttbroker.utils.Utils.generatePassword
 import `in`.naveens.mqttbroker.utils.Utils.getIPAddress
 import `in`.naveens.mqttbroker.utils.Utils.isMyServiceRunning
 import `in`.naveens.mqttbroker.utils.Utils.networkRequest
-import android.content.*
-import android.content.SharedPreferences.OnSharedPreferenceChangeListener
-import android.net.ConnectivityManager
-import android.os.Bundle
-import android.util.Log
-import android.view.View
-import androidx.appcompat.app.AppCompatActivity
-import androidx.preference.EditTextPreference
-import androidx.preference.PreferenceFragmentCompat
-import androidx.preference.PreferenceManager
-import androidx.preference.SwitchPreference
-import com.google.android.material.snackbar.Snackbar
 
 
 class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
@@ -60,7 +68,7 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
         private var host: EditTextPreference? = null
         private var port: EditTextPreference? = null
         private var username: EditTextPreference? = null
-        var password: EditTextPreference? = null
+        private var password: EditTextPreference? = null
         private var authEnable: SwitchPreference? = null
         var brokerTurnOrOff: SwitchPreference? = null
         private val TAG = "SettingsFragment"
@@ -98,11 +106,13 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
                         true -> {
                             Log.d(TAG, "onReceive: ")
                         }
+
                         false -> {
                             host?.text = "Not Set"
                             brokerTurnOrOff?.isChecked = false
                             (activity as MainActivity).stopService()
                         }
+
                         else -> {
                             host?.text = "Not Set"
                             brokerTurnOrOff?.isChecked = false
@@ -147,13 +157,13 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
         }
     }
 
-    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
-        Log.d(TAG, "Preference changed. $key")
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, p1: String?) {
+        Log.d(TAG, "Preference changed. $p1")
         try {
-            when (key) {
+            when (p1) {
                 getString(R.string.mqtt_broker_status) -> {
                     Log.d(TAG, "Server status changed")
-                    val status = sharedPreferences.getBoolean(key, false)
+                    val status = sharedPreferences.getBoolean(p1, false)
                     Log.d(TAG, "Start Server?$status")
                     if (status) {
                         val type = Utils.networkType(this)
@@ -168,6 +178,7 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
                                 Log.d(TAG, "Starting Server")
                                 startService()
                             }
+
                             else -> {
                                 intent.putExtra("status", false)
                                 val contextView = findViewById<View>(android.R.id.content)
@@ -189,13 +200,14 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
                         stopService()
                     }
                 }
+
                 getString(R.string.mqtt_auth_status) -> {
                     Log.d(TAG, "Restarting mqtt service")
                     Log.d(
                         TAG,
-                        "onSharedPreferenceChanged: " + sharedPreferences.getBoolean(key, false)
+                        "onSharedPreferenceChanged: " + sharedPreferences.getBoolean(p1, false)
                     )
-                    val status = sharedPreferences.getBoolean(key, false)
+                    val status = sharedPreferences.getBoolean(p1, false)
                     AppPreferences.mqttAuthStatus = status
                     if (AppPreferences.mqttBrokerStatus) {
                         Thread {
@@ -203,28 +215,24 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
                             startService()
                         }.start()
                     }
-                    val contextView = findViewById<View>(android.R.id.content)
-                    Snackbar.make(contextView, "MQTT broker config updated.", Snackbar.LENGTH_LONG)
-                        .show()
+                    showSnackBar("MQTT broker config updated.")
 
                 }
+
                 getString(R.string.mqtt_password), getString(R.string.mqtt_username), getString(R.string.mqtt_port) -> {
-                    if (key == getString(R.string.mqtt_password)) {
-                        AppPreferences.mqttPassword = sharedPreferences.getString(key, "")
+                    if (p1 == getString(R.string.mqtt_password)) {
+                        AppPreferences.mqttPassword = sharedPreferences.getString(p1, "")
                     }
-                    if (key == getString(R.string.mqtt_username)) {
-                        AppPreferences.mqttUserName = sharedPreferences.getString(key, "")
+                    if (p1 == getString(R.string.mqtt_username)) {
+                        AppPreferences.mqttUserName = sharedPreferences.getString(p1, "")
                     }
-                    if (key == getString(R.string.mqtt_port)) {
-                        AppPreferences.mqttPort = sharedPreferences.getString(key, "")
+                    if (p1 == getString(R.string.mqtt_port)) {
+                        AppPreferences.mqttPort = sharedPreferences.getString(p1, "")
                     }
-                    val contextView = findViewById<View>(android.R.id.content)
-                    Snackbar.make(
-                        contextView,
-                        "You need to restart the server for applying the config changes",
-                        Snackbar.LENGTH_LONG
-                    ).show()
+                    showSnackBar("You need to restart the server for applying the config changes")
                 }
+
+                else -> {}
             }
         } catch (e: Exception) {
             Log.e(TAG, "onSharedPreferenceChanged: $e")
@@ -242,6 +250,36 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
 
     private fun startService() {
         Log.d(TAG, "Starting MQTT Service")
+
+        // Sets up permissions request launcher.
+        val requestPermissionLauncher =
+            registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+                if (!it) {
+                    Log.w(TAG, "startService: permission not granted")
+                    showSnackBar("Please grant Notification permission from App Settings")
+                }
+            }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    android.Manifest.permission.POST_NOTIFICATIONS,
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                try {
+                    requestPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+                } catch (ex: Exception) {
+                    Log.e(TAG, "onCreate: ", ex)
+                    showSnackBar(
+                        ex.localizedMessage ?: "Unknown error occurred when requesting permission"
+                    )
+                }
+            } else {
+                showSnackBar("Please grant Notification permission from App Settings")
+                Log.w(TAG, "startService: notification permission not granted for api 33 and above")
+                return
+            }
+        }
+
         val serviceIntent = Intent(this, MqttService::class.java)
         if (isMyServiceRunning(this, MqttService::class.java)) {
             stopService(serviceIntent)
@@ -249,6 +287,15 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
         if (AppPreferences.mqttBrokerStatus) {
             startForegroundService(serviceIntent)
         }
+    }
+
+    private fun showSnackBar(message: String) {
+        val contextView = findViewById<View>(android.R.id.content)
+        Snackbar.make(
+            contextView,
+            message,
+            Snackbar.LENGTH_LONG
+        ).show()
     }
 
     private fun stopService() {

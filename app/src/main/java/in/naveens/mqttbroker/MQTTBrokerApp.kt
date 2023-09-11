@@ -1,7 +1,7 @@
 package `in`.naveens.mqttbroker
 
-import `in`.naveens.mqttbroker.utils.AppPreferences
 import android.app.Application
+import `in`.naveens.mqttbroker.utils.AppPreferences
 
 class MQTTBrokerApp : Application() {
     override fun onCreate() {
