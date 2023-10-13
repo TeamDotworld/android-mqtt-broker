@@ -10,8 +10,10 @@ import android.content.pm.PackageManager
 import android.net.ConnectivityManager
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import android.view.View
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -51,6 +53,16 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
         _binding = SettingsActivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        requestNotificationPermissionIntentLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+                if (it.resultCode == RESULT_OK) {
+                    Log.d(TAG, "notification permission granted")
+                } else {
+                    Log.w(TAG, "notification permission not granted")
+                    showSnackBar("Please grant Notification permission from App Settings")
+                }
+            }
+
         if (savedInstanceState == null) {
             supportFragmentManager
                 .beginTransaction()
@@ -61,6 +73,8 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
             title = savedInstanceState.getCharSequence(TAG)
         }
     }
+
+    private var requestNotificationPermissionIntentLauncher: ActivityResultLauncher<Intent>? = null
 
     class SettingsFragment : PreferenceFragmentCompat() {
 
@@ -252,13 +266,6 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
         Log.d(TAG, "Starting MQTT Service")
 
         // Sets up permissions request launcher.
-        val requestPermissionLauncher =
-            registerForActivityResult(ActivityResultContracts.RequestPermission()) {
-                if (!it) {
-                    Log.w(TAG, "startService: permission not granted")
-                    showSnackBar("Please grant Notification permission from App Settings")
-                }
-            }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(
                     this,
@@ -266,16 +273,15 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
                 ) != PackageManager.PERMISSION_GRANTED
             ) {
                 try {
-                    requestPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+                    val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+                    intent.putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
+                    requestNotificationPermissionIntentLauncher?.launch(intent)
                 } catch (ex: Exception) {
                     Log.e(TAG, "onCreate: ", ex)
                     showSnackBar(
                         ex.localizedMessage ?: "Unknown error occurred when requesting permission"
                     )
                 }
-            } else {
-                showSnackBar("Please grant Notification permission from App Settings")
-                Log.w(TAG, "startService: notification permission not granted for api 33 and above")
                 return
             }
         }
@@ -299,9 +305,13 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
     }
 
     private fun stopService() {
-        Log.d(TAG, "Stopping MQTT Service")
-        val serviceIntent = Intent(this, MqttService::class.java)
-        stopService(serviceIntent)
+        try {
+            Log.d(TAG, "Stopping MQTT Service")
+            val serviceIntent = Intent(this, MqttService::class.java)
+            stopService(serviceIntent)
+        } catch (ex: Exception) {
+            Log.e(TAG, "stopService: ", ex)
+        }
     }
 
     private fun setIP() {
