@@ -22,6 +22,10 @@ import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
 import androidx.preference.SwitchPreference
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory
+import com.google.android.play.core.appupdate.AppUpdateOptions
+import com.google.android.play.core.install.model.AppUpdateType
+import com.google.android.play.core.install.model.UpdateAvailability
 import `in`.naveens.mqttbroker.databinding.SettingsActivityBinding
 import `in`.naveens.mqttbroker.service.MqttService
 import `in`.naveens.mqttbroker.utils.AppPreferences
@@ -71,6 +75,29 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
 
         } else {
             title = savedInstanceState.getCharSequence(TAG)
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        checkForInAppUpdate()
+    }
+
+    private fun checkForInAppUpdate() {
+        val updateManager = AppUpdateManagerFactory.create(this)
+        val appUpdateInfoTask = updateManager.appUpdateInfo
+        appUpdateInfoTask.addOnSuccessListener {
+            if (it.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE && it.isUpdateTypeAllowed(
+                    AppUpdateType.IMMEDIATE
+                )
+            ) {
+                updateManager.startUpdateFlowForResult(
+                    it,
+                    this,
+                    AppUpdateOptions.newBuilder(AppUpdateType.IMMEDIATE).build(),
+                    0
+                )
+            }
         }
     }
 
