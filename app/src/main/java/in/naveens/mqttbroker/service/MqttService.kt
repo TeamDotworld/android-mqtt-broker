@@ -23,10 +23,11 @@ import java.util.concurrent.ExecutionException
 import java.util.concurrent.FutureTask
 
 open class MqttService : Service() {
+
     private val TAG = MqttService::class.java.simpleName
     private val CHANNEL_ID = "MQTTBrokerNotificationChannel"
 
-    var mqttBroker: MQTTBroker? = null
+    private var mqttBroker: MQTTBroker? = null
     private var thread: Thread? = null
 
     override fun onBind(intent: Intent?): IBinder? {

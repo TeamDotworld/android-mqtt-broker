@@ -15,8 +15,8 @@ import java.util.Random
 object Utils {
 
     const val TAG = "Utils"
-    val MQTT_STATUS_ON_OR_OFF="mqtt_updates"
-    val NETWORK_BROADCAST_ACTION="network_change"
+    const val MQTT_STATUS_ON_OR_OFF = "mqtt_updates"
+    const val NETWORK_BROADCAST_ACTION = "network_change"
 
     fun generatePassword(): String {
         val leftLimit = 48 // numeral '0'
@@ -49,14 +49,15 @@ object Utils {
 
     fun getIPAddress(useIPv4: Boolean): String {
         try {
-            val interfaces: List<NetworkInterface> =
+            val networkInterfaces: List<NetworkInterface> =
                 Collections.list(NetworkInterface.getNetworkInterfaces())
-            for (intf in interfaces) {
-                val addrs: List<InetAddress> = Collections.list(intf.inetAddresses)
-                Log.d(TAG, "getIPAddress: $addrs")
-                for (addr in addrs) {
-                    if (!addr.isLoopbackAddress) {
-                        val sAddr = addr.hostAddress
+            for (networkInterface in networkInterfaces) {
+                val inetAddressList: List<InetAddress> =
+                    Collections.list(networkInterface.inetAddresses)
+                Log.d(TAG, "getIPAddress: $inetAddressList")
+                for (inetAddress in inetAddressList) {
+                    if (!inetAddress.isLoopbackAddress) {
+                        val sAddr = inetAddress.hostAddress
                         if (sAddr != null) {
                             val isIPv4 = sAddr.indexOf(':') < 0
                             if (useIPv4) {
@@ -79,26 +80,15 @@ object Utils {
         return ""
     }
 
-    fun networkType(context: Context) : Type{
-        val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val netInfo = cm.activeNetworkInfo
-        Log.d("MqttService", "networkType: ${netInfo?.typeName}")
-        if (netInfo != null){
-            return Type.valueOf(netInfo.typeName)
-        }
-        return Type.NONE
+    fun isConnectedToWifi(context: Context): Boolean {
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val network = connectivityManager.activeNetwork ?: return false
+        val capabilities = connectivityManager.getNetworkCapabilities(network)
+        return capabilities != null && capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)
     }
 
-    enum class Type{
-        WIFI,
-        MOBILE,
-        ETHERNET,
-        NONE
-    }
-
-    val networkRequest = NetworkRequest.Builder()
-        .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+    val networkRequest: NetworkRequest = NetworkRequest.Builder()
         .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
-        .addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR)
         .build()
 }

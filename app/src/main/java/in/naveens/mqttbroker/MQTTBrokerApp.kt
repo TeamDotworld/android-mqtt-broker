@@ -12,5 +12,6 @@ class MQTTBrokerApp : Application() {
 
     companion object {
         lateinit var instance: MQTTBrokerApp
+            private set
     }
 }

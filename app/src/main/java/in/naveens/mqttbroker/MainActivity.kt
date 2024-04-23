@@ -103,13 +103,17 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
             val connectivityManager =
                 requireContext().getSystemService(ConnectivityManager::class.java) as ConnectivityManager
             connectivityManager.requestNetwork(networkRequest, NetworkCallBack())
-            requireContext().registerReceiver(
-                receiver,
-                IntentFilter(Utils.MQTT_STATUS_ON_OR_OFF)
+            ContextCompat.registerReceiver(
+                requireContext(),
+                mqttReceiver,
+                IntentFilter(Utils.MQTT_STATUS_ON_OR_OFF),
+                ContextCompat.RECEIVER_NOT_EXPORTED
             )
-            requireContext().registerReceiver(
+            ContextCompat.registerReceiver(
+                requireContext(),
                 networkReceiver,
-                IntentFilter(Utils.NETWORK_BROADCAST_ACTION)
+                IntentFilter(Utils.NETWORK_BROADCAST_ACTION),
+                ContextCompat.RECEIVER_NOT_EXPORTED
             )
         }
 
@@ -138,8 +142,9 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
 
             }
         }
-        private val receiver = object : BroadcastReceiver() {
+        private val mqttReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
+                Log.i(TAG, "onReceive: ${intent?.extras?.getBoolean("status")}")
                 if (intent?.extras?.getBoolean("status") == true) {
                     host?.text = intent.extras?.getString("host")
                     brokerTurnOrOff?.isChecked = true
@@ -179,40 +184,34 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
                     Log.d(TAG, "Server status changed")
                     val status = sharedPreferences.getBoolean(p1, false)
                     Log.d(TAG, "Start Server?$status")
+                    val broadcastIntent = Intent(Utils.MQTT_STATUS_ON_OR_OFF)
+                    broadcastIntent.setPackage(packageName)
                     if (status) {
-                        val type = Utils.networkType(this)
+                        val type = Utils.isConnectedToWifi(this)
                         Log.d(TAG, "onSharedPreferenceChanged: $type")
-                        val intent = Intent(Utils.MQTT_STATUS_ON_OR_OFF)
-                        when (Utils.networkType(this@MainActivity)) {
-                            Utils.Type.WIFI -> {
-                                intent.putExtra("host", getIPAddress(true))
-                                intent.putExtra("status", true)
-                                sendBroadcast(intent)
-                                AppPreferences.mqttBrokerStatus = true
-                                Log.d(TAG, "Starting Server")
-                                startService()
-                            }
-
-                            else -> {
-                                intent.putExtra("status", false)
-                                val contextView = findViewById<View>(android.R.id.content)
-                                Snackbar.make(
-                                    contextView,
-                                    "MQTT will only work on Local Wifi Network",
-                                    Snackbar.LENGTH_LONG
-                                ).show()
-                                Log.d(TAG, "onSharedPreferenceChanged: Unsupported Network type")
-                                sendBroadcast(intent)
-                            }
+                        if (Utils.isConnectedToWifi(this@MainActivity)) {
+                            broadcastIntent.putExtra("host", getIPAddress(true))
+                            broadcastIntent.putExtra("status", true)
+                            AppPreferences.mqttBrokerStatus = true
+                            Log.d(TAG, "Starting Server")
+                            startService()
+                        } else {
+                            broadcastIntent.putExtra("status", false)
+                            val contextView = findViewById<View>(android.R.id.content)
+                            Snackbar.make(
+                                contextView,
+                                "MQTT will only work on Local Wifi Network",
+                                Snackbar.LENGTH_LONG
+                            ).show()
+                            Log.d(TAG, "onSharedPreferenceChanged: Unsupported Network type")
                         }
                     } else {
-                        val intent = Intent(Utils.MQTT_STATUS_ON_OR_OFF)
-                        intent.putExtra("status", false)
-                        sendBroadcast(intent)
+                        broadcastIntent.putExtra("status", false)
                         AppPreferences.mqttBrokerStatus = false
                         Log.d(TAG, "Stopping Server")
                         stopService()
                     }
+                    sendBroadcast(broadcastIntent)
                 }
 
                 getString(R.string.mqtt_auth_status) -> {

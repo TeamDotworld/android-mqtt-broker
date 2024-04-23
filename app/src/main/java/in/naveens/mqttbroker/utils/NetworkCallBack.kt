@@ -5,7 +5,7 @@ import android.net.ConnectivityManager
 import android.net.Network
 import `in`.naveens.mqttbroker.MQTTBrokerApp
 
-class NetworkCallBack() : ConnectivityManager.NetworkCallback() {
+class NetworkCallBack : ConnectivityManager.NetworkCallback() {
 
     private val TAG = "NetworkCallBack"
 
