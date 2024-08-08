@@ -220,19 +220,20 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
                             broadcastIntent.putExtra("host", getIPAddress(true))
                             broadcastIntent.putExtra("status", true)
                             AppPreferences.mqttBrokerStatus = true
+                            AppPreferences.allowLocalRun = false
                             Log.d(TAG, "Starting Server")
                             startService()
                         } else {
-                            broadcastIntent.putExtra("status", false)
-                            val contextView = findViewById<View>(android.R.id.content)
-                            Snackbar.make(
-                                contextView,
-                                "MQTT will only work on Local Wifi Network",
-                                Snackbar.LENGTH_LONG
-                            ).show()
-                            Log.d(TAG, "onSharedPreferenceChanged: Unsupported Network type")
+                            broadcastIntent.putExtra("status", true)
+                            broadcastIntent.putExtra("host", "127.0.0.1")
+                            AppPreferences.mqttBrokerStatus = true
+                            AppPreferences.allowLocalRun = true
+                            Log.d(TAG, "Starting Server")
+                            startService()
                         }
                     } else {
+                        AppPreferences.allowLocalRun = false
+                        AppPreferences.mqttHost = ""
                         broadcastIntent.putExtra("status", false)
                         AppPreferences.mqttBrokerStatus = false
                         Log.d(TAG, "Stopping Server")

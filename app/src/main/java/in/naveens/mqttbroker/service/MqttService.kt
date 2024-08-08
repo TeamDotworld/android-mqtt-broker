@@ -128,7 +128,10 @@ open class MqttService : Service() {
                 Toast.makeText(this, "Unable to generate auth file", Toast.LENGTH_SHORT).show()
             }
         }
-        props.setProperty(BrokerConstants.HOST_PROPERTY_NAME, Utils.getIPAddress(true))
+        props.setProperty(
+            BrokerConstants.HOST_PROPERTY_NAME,
+            if (AppPreferences.allowLocalRun) "127.0.0.1" else Utils.getIPAddress(true)
+        )
         props.setProperty(
             BrokerConstants.WEB_SOCKET_PORT_PROPERTY_NAME,
             BrokerConstants.WEBSOCKET_PORT.toString()

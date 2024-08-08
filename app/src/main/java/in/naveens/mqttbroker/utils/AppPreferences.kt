@@ -15,6 +15,7 @@ object AppPreferences {
     private val MQTT_USER_NAME = Pair("mqtt_username", "admin")
     private val MQTT_PASSWORD = Pair("mqtt_password", null)
     private val MQTT_HOST = Pair("mqtt_host", null)
+    private val MQTT_ALLOW_LOCAL_RUN = Pair("mqtt_allow_local_run", false)
 
     fun init(context: Context) {
         preferences = context.getSharedPreferences(NAME, MODE)
@@ -64,5 +65,11 @@ object AppPreferences {
         get() = preferences.getString(MQTT_HOST.first, MQTT_HOST.second)
         set(value) = preferences.edit {
             it.putString(MQTT_HOST.first, value)
+        }
+
+    var allowLocalRun: Boolean
+        get() = preferences.getBoolean(MQTT_ALLOW_LOCAL_RUN.first, MQTT_ALLOW_LOCAL_RUN.second)
+        set(value) = preferences.edit {
+            it.putBoolean(MQTT_ALLOW_LOCAL_RUN.first, value)
         }
 }
