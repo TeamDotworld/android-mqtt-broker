@@ -17,6 +17,9 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.preference.EditTextPreference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
@@ -47,6 +50,8 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         if (AppPreferences.firstRun) {
             initSharedPrefs()
             Log.d(TAG, "onCreate: its first time run")
@@ -56,6 +61,11 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
         sharedPreferences.registerOnSharedPreferenceChangeListener(this)
         _binding = SettingsActivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(0, systemBars.top, 0, systemBars.bottom)
+            insets
+        }
 
         requestNotificationPermissionIntentLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
